@@ -16,8 +16,12 @@ Disajikan lewat GitHub Pages: https://riacaya.github.io/Cek-NIK/
 
 ## Isi `github/`
 
-- `index.html` — halaman cek NIK. `API_URL` diarahkan ke worker Cloudflare (`divine-fog-0a93`), path aset dibuat relatif agar cocok di `riacaya.github.io/Cek-NIK/`.
-- `assets/` — `pro.json`, `kab.json`, `kec.json` (data wilayah), `logo.png`.
+- `index.html` — halaman cek NIK **mode ganda**:
+  - **GitHub Pages** (dibuka di `riacaya.github.io/Cek-NIK/`) tampil sebagai halaman penuh.
+  - **Blog/Blogger** — tempel **seluruh isi file** ke pos (mode HTML). Deteksi otomatis membuatnya jadi widget terkurung di `<div id="cn-page">`, jadi CSS-nya tidak merusak tema blog, dan aset wilayah diambil dari URL absolut Pages (GitHub Pages mengirim `Access-Control-Allow-Origin: *`).
+  - `API_URL` diarahkan ke worker Cloudflare (`divine-fog-0a93`).
+  - Uji mode widget dari komputer: buka `index.html?widget=1`.
+- `assets/` — `pro.json`, `kab/`, `kec.json` (data wilayah), `logo.png`.
 
 ## Perubahan halaman
 
