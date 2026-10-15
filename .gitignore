@@ -1,0 +1,19 @@
+# artefak build Android
+android-app/.gradle/
+android-app/.kotlin/
+android-app/build/
+android-app/app/build/
+android-app/local.properties
+*.apk
+*.aab
+
+# cache & state lokal
+.wrangler/
+.freebuff/
+node_modules/
+tunnel.log
+
+# editor / OS
+Thumbs.db
+.DS_Store
+*.swp

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tes Frame SIPOL KPU</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 20px;
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f4f6f8; color: #1b2733;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.sub { margin: 0 0 16px; color: #5b6b7c; font-size: 13px; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+  .card {
+    background: #fff; border: 1px solid #dfe5ec; border-radius: 10px;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .card h2 { font-size: 14px; margin: 0; padding: 10px 14px; background: #eef2f7; }
+  .card .meta { font-size: 12px; color: #5b6b7c; padding: 8px 14px 0; word-break: break-all; }
+  .status {
+    margin: 8px 14px; padding: 6px 10px; border-radius: 6px;
+    font-size: 13px; font-weight: 600; background: #fff3cd; color: #7a5b00;
+  }
+  .status.ok  { background: #d9f2e0; color: #10632c; }
+  .status.bad { background: #fbdcdc; color: #8a1220; }
+  iframe {
+    width: 100%; height: 320px; border: 1px dashed #c3ccd6;
+    margin: 8px 14px 14px; background: #fafbfc; border-radius: 6px;
+  }
+  #log {
+    margin-top: 16px; padding: 12px 14px; background: #10161d; color: #9fe8a9;
+    font: 12px/1.6 ui-monospace, Consolas, monospace; border-radius: 8px;
+    white-space: pre-wrap; min-height: 3em;
+  }
+</style>
+</head>
+<body>
+
+<h1>Tes Frame (iframe) ke SIPOL KPU</h1>
+<p class="sub">Uji apakah halaman KPU bisa dibuka di dalam frame. Ekspektasi dari rekaman header KPU:
+<code>X-Frame-Options: DENY</code> + <code>frame-ancestors 'none'</code> → harusnya DITOLAK.</p>
+
+<div class="grid">
+  <div class="card">
+    <h2>1. infopemilu — Cari NIK (halaman form pencarian)</h2>
+    <div class="meta">https://infopemilu.kpu.go.id/Pemilu/Cari_nik</div>
+    <div class="status" id="s1">⏳ memuat…</div>
+    <iframe id="f1" src="https://infopemilu.kpu.go.id/Pemilu/Cari_nik"></iframe>
+  </div>
+
+  <div class="card">
+    <h2>2. SIPOL — sipol.kpu.go.id (login parpol)</h2>
+    <div class="meta">https://sipol.kpu.go.id/</div>
+    <div class="status" id="s2">⏳ memuat…</div>
+    <iframe id="f2" src="https://sipol.kpu.go.id/"></iframe>
+  </div>
+
+  <div class="card">
+    <h2>3. Kontrol — frame lokal (harus SELALU bisa)</h2>
+    <div class="meta">srcdoc (HTML lokal, bukan KPU) — pembanding</div>
+    <div class="status" id="s3">⏳ memuat…</div>
+    <iframe id="f3" srcdoc="&lt;h1 style=&quot;font:20px system-ui;padding:24px&quot;&gt;Frame kontrol ✔ tampil&lt;/h1&gt;&lt;p style=&quot;font:14px system-ui;padding:0 24px&quot;&gt;Halaman lokal, bukan KPU — bukti iframe halaman ini berfungsi.&lt;/p&gt;"></iframe>
+  </div>
+</div>
+
+<div id="log">log:
+</div>
+
+<script>
+(function () {
+  var log = document.getElementById('log');
+  function say(m) { log.textContent += m + "\n"; }
+  window.addEventListener('message', function (e) {
+    // tidak ada postMessage yang diharapkan — hanya deteksi error bila browser mengirim
+    say('[message] ' + (typeof e.data === 'string' ? e.data : JSON.stringify(e.data)));
+  });
+
+  function watch(id, label) {
+    var f = document.getElementById(id), s = document.getElementById('s' + id.slice(1));
+    var t0 = Date.now(), loaded = false;
+    f.addEventListener('load', function () {
+      loaded = true;
+      var dt = ((Date.now() - t0) / 1000).toFixed(2);
+      var info = '';
+      try {
+        // properti cross-origin yang boleh dibaca: length (jumlah frame di dalamnya)
+        info = ' | inner frames=' + f.contentWindow.length;
+      } catch (err) { info = ' | akses dibatasi: ' + err.name; }
+      s.textContent = '✅ event load terpicu setelah ' + dt + ' dtk' + info;
+      s.classList.add('ok');
+      say('[' + label + '] load terpicu (' + dt + ' dtk)' + info);
+      say('[' + label + '] CATATAN: load terpicu ≠ tampil — frame yang diblokir XFO/CSP');
+      say('           tetap memicu load dengan halaman kosong/error. Lihat isi frame di atas.');
+    });
+    setTimeout(function () {
+      if (!loaded) {
+        s.textContent = '❌ tidak ada load sama sekali dalam 10 dtk (timeout)';
+        s.classList.add('bad');
+        say('[' + label + '] timeout — load tidak pernah terpicu');
+      }
+    }, 10000);
+  }
+
+  watch('f1', 'infopemilu');
+  watch('f2', 'sipol');
+  watch('f3', 'kontrol');
+
+  //deteksi blokir dari sisi CSP (dilaporkan ke console bila browser menuliskannya)
+  if (window.performance && performance.getEntriesByType) {
+    setTimeout(function () {
+      var r = performance.getEntriesByType('resource').filter(function (e) {
+        return e.name.indexOf('kpu.go.id') > -1;
+      });
+      say('[perf] resource KPU tercatat: ' + r.length);
+      r.forEach(function (e) {
+        say('  - ' + e.name + ' | transfer=' + (e.transferSize || '?') + ' B | status via timing tak tersedia');
+      });
+    }, 8000);
+  }
+})();
+</script>
+</body>
+</html>
