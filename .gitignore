@@ -13,6 +13,15 @@ android-app/local.properties
 node_modules/
 tunnel.log
 
+# bukan bagian dari penggunaan Cek-NIK — hanya di lokal
+android-app/
+endpointnik.md
+tes-*.html
+buat-tiruan.js
+uji-relai-vps.sh
+worker-lokal.js
+single/id.txt
+
 # editor / OS
 Thumbs.db
 .DS_Store
