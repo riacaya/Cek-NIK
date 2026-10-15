@@ -19,12 +19,12 @@
 </main><footer><a class="install-app" href="https://drive.google.com/file/d/1E3OGSDm7TsUeLAaXGkZG8YClzm0U1_t2/view?usp=sharing" target="_blank" rel="noopener">📲 Install app</a>Created By:<br>RiaCaya - Realization Dreams<br>Telp: +6282338013610 · Email: riacaya99@gmail.com</footer>
 <script>
 
-var API_URL='';
+var API_URL='https://divine-fog-0a93.riacaya99.workers.dev';
 var WIL_PRO={},WIL_KAB={},WIL_KEC={},WIL_LOADED=null;
 function peta(j,k){var a=j&&j[k],o={};if(Array.isArray(a)){a.forEach(function(x){if(x&&x.id!=null)o[String(x.id)]=x.nama||x.name||''});return o}return a||j||o}
 function muatWilayah(){
   if(WIL_LOADED)return WIL_LOADED;
-  var base=(location.protocol==='file:'?'http://127.0.0.1:8788':'');
+  var base=(location.protocol==='file:'?'http://127.0.0.1:8788':'.');
   WIL_LOADED=Promise.all(['pro','kab','kec'].map(function(k){return fetch(base+'/assets/'+k+'.json').then(function(r){if(!r.ok)throw Error('Gagal memuat assets/'+k+'.json');return r.json()})})).then(function(a){WIL_PRO=peta(a[0],'pro');WIL_KAB=peta(a[1],'kab');WIL_KEC=peta(a[2],'kec')});
   return WIL_LOADED;
 }
