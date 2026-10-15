@@ -71,14 +71,16 @@ html.cn-full #cn-page main{width:100%;margin:0 auto;flex:1 0 auto}
 #cn-page .setting-row{display:flex;align-items:center;background:transparent;gap:10px;padding:13px 0;border-bottom:0}
 #cn-page .setting-row button{flex:1;text-align:left;background:transparent;color:var(--ink);padding-left:0}
 #cn-page .setting-row button.active::after{content:"\2713";float:right;font-weight:700;color:var(--blue)}
-#cn-page .theme-senja{--bg:#fff4e6;--ink:#422006;--panel:#fffaf3;--blue:#c2410c;--foot:#fed7aa;--result:#b45309}
-#cn-page .theme-senja header{background:linear-gradient(120deg,#9a3412,#f59e0b)}
-#cn-page .theme-night{--bg:#0b1220;--ink:#e5edf8;--panel:#24324a;--muted:#aebdd1;--blue:#60a5fa;--foot:#334155;--result:#26915f}
-#cn-page .theme-night header{background:linear-gradient(120deg,#020617,#172554)}
-#cn-page .theme-night .card{background:#24324a}
-#cn-page .theme-night input{background:#33445f;color:#fff}
-#cn-page .theme-elegan{--bg:#f7f3ea;--ink:#292524;--panel:#fffdf8;--muted:#78716c;--blue:#7c3f20;--foot:#e7d7c5;--result:#795548}
-#cn-page .theme-elegan header{background:linear-gradient(120deg,#3f2d24,#a16207)}
+/* tema: class ditempel pada #cn-page sendiri (dan <html> pada mode halaman penuh),
+   jadi pemilihnya TANPA spasi — "#cn-page.theme-x", bukan "#cn-page .theme-x" */
+html.theme-senja,#cn-page.theme-senja{--bg:#fff4e6;--ink:#422006;--panel:#fffaf3;--blue:#c2410c;--foot:#fed7aa;--result:#b45309}
+#cn-page.theme-senja header{background:linear-gradient(120deg,#9a3412,#f59e0b)}
+html.theme-night,#cn-page.theme-night{--bg:#0b1220;--ink:#e5edf8;--panel:#24324a;--muted:#aebdd1;--blue:#60a5fa;--foot:#334155;--result:#26915f}
+#cn-page.theme-night header{background:linear-gradient(120deg,#020617,#172554)}
+#cn-page.theme-night .card{background:#24324a}
+#cn-page.theme-night input{background:#33445f;color:#fff}
+html.theme-elegan,#cn-page.theme-elegan{--bg:#f7f3ea;--ink:#292524;--panel:#fffdf8;--muted:#78716c;--blue:#7c3f20;--foot:#e7d7c5;--result:#795548}
+#cn-page.theme-elegan header{background:linear-gradient(120deg,#3f2d24,#a16207)}
 #cn-page footer{text-align:center;color:var(--ink);background:var(--foot,#dbeafe);font-size:12px;padding:18px 10px 28px}
 #cn-page footer .install-app{display:block;margin:0 0 8px;font-size:13px;font-weight:700;color:var(--blue);text-decoration:none}
 #cn-page footer .install-app:active{opacity:.7}
