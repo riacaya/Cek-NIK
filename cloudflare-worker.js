@@ -31,10 +31,17 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 // --- Firewall KPU menolak IP Cloudflare DAN Google (terbukti lewat ?ping=1 di GAS),
 // tapi menerima IP PC pengguna. KPU_RELAY = relai di PC via tunnel (jalankan_relay.bat):
 // server.js /relay menerima POST JSON {url, body, headers}, memanggil KPU dari IP PC,
-// membalas {status, text}. Selama PC relay mati worker tetap melayani: SIPOL gagal jujur,
-// DTSEN tetap jalan. Kosongkan bila tidak ada relai. (Kontrak sama dengan gas-relay.js.)
+// membalas {status, text}. Selama PC relay mati worker tetap melayani: SIPOL gagal jujur.
+// Kosongkan bila tidak ada relai. (Kontrak sama dengan gas-relay.js.)
+// SAMA untuk DTSEN: cekbansos.kemensos.go.id juga memblokir IP Cloudflare (timeout),
+// padahal dari PC cuma 0,4 dtk — maka captcha & cek DTSEN ikut lewat relai PC
+// (endpoint server.js /api/bansos/* yang sama, sesi captcha disimpan di memori PC).
 const KPU_RELAY = 'https://ceknik-relay-3311.loca.lt/relay?t=ceknik-relay-2026';
 const KPU_TIMEOUT = 18000;
+
+// Asal & token relai diturunkan dari KPU_RELAY — cukup ganti satu tempat.
+const RELAY_BASE = KPU_RELAY ? new URL(KPU_RELAY).origin : '';
+const RELAY_TOKEN = KPU_RELAY ? (new URL(KPU_RELAY).searchParams.get('t') || '') : '';
 
 const CORS = {
   'access-control-allow-origin': '*',
@@ -257,24 +264,78 @@ async function sipol(nik) {
 }
 
 // ------------------------------------------------------- 2) CAPTCHA DTSEN
+// Relai endpoint server.js (sesi captcha disimpan di PC): worker hanya meneruskan.
+// Edge localtunnel suka berdebar → pakai retry menyebar seperti kpuViaRelay.
+async function relayApi(pathname, opts) {
+  if (!RELAY_BASE) throw new Error('relai belum dikonfigurasi (KPU_RELAY kosong)');
+  const o = opts || {};
+  const url = RELAY_BASE + pathname + '?t=' + encodeURIComponent(RELAY_TOKEN);
+  let err = null;
+  const MAX_TRY = 5;
+  for (let percobaan = 0; percobaan < MAX_TRY; percobaan++) {
+    const tA = Date.now();
+    try {
+      const r = await call(url, {
+        method: o.method || 'POST',
+        // UA non-browser: localtunnel menampilkan halangan HTTP 511 ke UA browser.
+        headers: { 'user-agent': 'ceknik-worker-relay/1.0', ...(o.headers || {}) },
+        body: o.body,
+        contentType: o.contentType,
+        timeout: o.timeout || 25000,
+      });
+      if (r.code >= 200 && r.code < 300) return r;
+      err = new Error('relai HTTP ' + r.code);
+    } catch (e) {
+      err = e;
+    }
+    if (Date.now() - tA >= 9000) break;   // gagal lambat = relay benar-benar mati
+    if (percobaan < MAX_TRY - 1) await new Promise((res) => setTimeout(res, 500 + percobaan * 300));
+  }
+  throw err || new Error('relai gagal');
+}
+
 async function bansosCaptcha() {
-  const home = await call(BANSOS + '/', { headers: { accept: 'text/html,application/xhtml+xml' } });
-  if (home.code !== 200) throw new Error('halaman cekbansos HTTP ' + home.code);
-  let cookie = mergeCookies(null, home.setCookies);
-  if (!cookie) throw new Error('cekbansos tidak memberi cookie (kemungkinan IP diblokir)');
-  const token = extractToken(home.text);
-  if (!token) throw new Error('token CSRF tidak ditemukan di halaman');
+  // --- Jalur 1: lewat relai PC (cekbansos memblokir IP Cloudflare).
+  let galatRelai = null;
+  if (RELAY_BASE) {
+    try {
+      const r = await relayApi('/api/bansos/captcha', { method: 'GET' });
+      let j = null;
+      try { j = JSON.parse(r.text); } catch (_) { /* bukan JSON */ }
+      if (j && j.ok && j.img) return j;
+      throw new Error((j && j.error) || 'balasan relai tidak berisi captcha');
+    } catch (e) {
+      galatRelai = (e && e.message) || e;
+    }
+  }
 
-  const cap = await call(BANSOS + '/captcha/flat?' + Date.now().toString(36), {
-    cookie,
-    headers: { referer: BANSOS + '/', accept: 'image/*,*/*' },
-  });
-  if (cap.code !== 200) throw new Error('gambar captcha HTTP ' + cap.code);
-  if (cap.bytes.byteLength < 100) throw new Error('gambar captcha kosong');
+  // --- Jalur 2: langsung dari IP Cloudflare (cadangan; biasanya diblokir → cepat menyerah).
+  try {
+    const home = await call(BANSOS + '/', { headers: { accept: 'text/html,application/xhtml+xml' }, timeout: 8000 });
+    if (home.code !== 200) throw new Error('halaman cekbansos HTTP ' + home.code);
+    let cookie = mergeCookies(null, home.setCookies);
+    if (!cookie) throw new Error('cekbansos tidak memberi cookie (kemungkinan IP diblokir)');
+    const token = extractToken(home.text);
+    if (!token) throw new Error('token CSRF tidak ditemukan di halaman');
 
-  const mime = (cap.header('content-type') || 'image/jpeg').split(';')[0];
-  cookie = mergeCookies(cookie, cap.setCookies) || cookie;
-  return { ok: true, id: encState({ token, cookie }), img: 'data:' + mime + ';base64,' + toB64(cap.bytes) };
+    const cap = await call(BANSOS + '/captcha/flat?' + Date.now().toString(36), {
+      cookie,
+      headers: { referer: BANSOS + '/', accept: 'image/*,*/*' },
+      timeout: 8000,
+    });
+    if (cap.code !== 200) throw new Error('gambar captcha HTTP ' + cap.code);
+    if (cap.bytes.byteLength < 100) throw new Error('gambar captcha kosong');
+
+    const mime = (cap.header('content-type') || 'image/jpeg').split(';')[0];
+    cookie = mergeCookies(cookie, cap.setCookies) || cookie;
+    return { ok: true, id: encState({ token, cookie }), img: 'data:' + mime + ';base64,' + toB64(cap.bytes) };
+  } catch (e) {
+    const langsung = (e && e.message) || e;
+    throw new Error(galatRelai
+      ? 'relai: ' + galatRelai + ' · langsung: ' + langsung +
+        (RELAY_BASE ? ' — jalankan_relay.bat di PC masih hidup?' : '')
+      : langsung);
+  }
 }
 
 // --------------------------------------------------------- 3) CEK DTSEN
@@ -305,6 +366,23 @@ function parseHasil(html) {
 }
 
 async function bansosCheck(id, nik, captcha) {
+  // Sesi buatan relai PC = 32 heksadesimal (server.js) → teruskan ke relai;
+  // sesi stateless buatan worker = base64 JSON → jalani langsung di sini.
+  if (/^[0-9a-f]{32}$/.test(id)) {
+    if (!RELAY_BASE) return { state: 'session', pesan: 'Sesi captcha ada di relai yang sudah dimatikan — muat ulang captcha lalu ulangi.' };
+    const r = await relayApi('/api/bansos/check', {
+      method: 'POST',
+      body: JSON.stringify({ id, nik, captcha }),
+      contentType: 'application/json',
+    });
+    let j = null;
+    try { j = JSON.parse(r.text); } catch (_) { /* bukan JSON */ }
+    if (!j || j.ok === false) throw new Error((j && j.error) || 'balasan relai tidak terbaca');
+    delete j.ok;
+    delete j.nik;
+    return j;
+  }
+
   let st;
   try {
     st = decState(id);
@@ -436,20 +514,52 @@ async function selftest(nik) {
     });
   }
 
-  // 2) cekbansos
+  // 2) cekbansos — lewat relai bila ada (IP Cloudflare diblokir), lalu langsung sbg pembanding
+  if (RELAY_BASE) {
+    const tRel = Date.now();
+    try {
+      const c = await relayApi('/api/bansos/captcha', { method: 'GET' });
+      let j = null;
+      try { j = JSON.parse(c.text); } catch (_) { /* bukan JSON */ }
+      langkah.push({
+        nama: 'Relai DTSEN (captcha via PC)',
+        ok: !!(j && j.ok && j.img),
+        detail: (Date.now() - tRel) + ' ms — ' +
+          (j && j.ok ? 'captcha diterima (id sesi ' + String(j.id).slice(0, 12) + '…)'
+                     : ((j && j.error) || 'HTTP ' + c.code)) +
+          (j && j.ok ? '' : ' — apakah jalankan_relay.bat di PC masih hidup?'),
+      });
+    } catch (e) {
+      langkah.push({
+        nama: 'Relai DTSEN (captcha via PC)', ok: false,
+        detail: String((e && e.message) || e) + ' (' + (Date.now() - tRel) +
+          ' ms) — apakah jalankan_relay.bat di PC masih hidup?',
+      });
+    }
+  } else {
+    langkah.push({
+      nama: 'Relai DTSEN (captcha via PC)', ok: false,
+      detail: 'belum dikonfigurasi (KPU_RELAY kosong) — cekbansos memblokir IP Cloudflare, wajib lewat relai',
+    });
+  }
+
   const tBan = Date.now();
   try {
-    const h = await call(BANSOS + '/', { headers: { accept: 'text/html,application/xhtml+xml' } });
-    langkah.push({ nama: '4. cekbansos dijangkau', ok: h.code === 200, detail: 'HTTP ' + h.code + ' dalam ' + (Date.now() - tBan) + ' ms' });
+    const h = await call(BANSOS + '/', { headers: { accept: 'text/html,application/xhtml+xml' }, timeout: 8000 });
+    langkah.push({ nama: 'cekbansos langsung dari IP Cloudflare', ok: h.code === 200, detail: 'HTTP ' + h.code + ' dalam ' + (Date.now() - tBan) + ' ms' });
     const cookie = mergeCookies(null, h.setCookies);
     const token = extractToken(h.text);
     langkah.push({
-      nama: '5. Cookie & token CSRF diterima',
+      nama: 'Cookie & token CSRF diterima (langsung)',
       ok: !!cookie && !!token,
       detail: cookie ? (token ? 'lengkap — captcha siap diminta' : 'cookie ada, token tidak ditemukan') : 'tidak ada cookie (situs memblokir IP ini)',
     });
   } catch (e) {
-    langkah.push({ nama: '4. cekbansos dijangkau', ok: false, detail: String((e && e.message) || e) });
+    langkah.push({
+      nama: 'cekbansos langsung dari IP Cloudflare', ok: RELAY_BASE,
+      detail: String((e && e.message) || e) + ' (' + (Date.now() - tBan) +
+        ' ms) — IP Cloudflare diblokir firewall Kemensos (wajar); data DTSEN diperoleh lewat relai PC.',
+    });
   }
 
   const gagal = langkah.filter((l) => !l.ok).length;

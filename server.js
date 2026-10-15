@@ -227,6 +227,17 @@ async function serve(rq, res) {
   if (rq.method === 'OPTIONS') { cors(res); res.writeHead(204); res.end(); return; }
   if (u.pathname === '/api/health') return json(200, { ok: true, port: PORT });
 
+  // Akses lewat tunnel (Host bukan lokal) wajib token — URL tunnel dibagikan lewat repo
+  // GitHub sehingga tidak boleh terbuka untuk siapa pun. Halaman lokal tetap tanpa token.
+  // /api/health sengaja dibiarkan terbuka agar pemantau jalankan_relay.bat bisa mengecek.
+  const viaTunnel = !/^(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$/i.test(
+    String(rq.headers['x-forwarded-host'] || rq.headers.host || '').split(',')[0].trim()
+  );
+  if (viaTunnel && u.pathname.startsWith('/api/') && u.pathname !== '/api/health' &&
+      u.searchParams.get('t') !== RELAY_TOKEN) {
+    return json(403, { error: 'token relai salah' });
+  }
+
   if (u.pathname === '/api/check') {
     const nik = (u.searchParams.get('nik') || '').trim();
     if (!/^\d{16}$/.test(nik)) return json(422, { error: 'NIK harus tepat 16 digit angka.' });
