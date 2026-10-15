@@ -1,6 +1,7 @@
 # folder lokal (bukan bagian situs GitHub)
 android-app/
 modal/
+relay/
 
 # cache & state lokal
 .wrangler/

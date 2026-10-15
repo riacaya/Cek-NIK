@@ -12,6 +12,7 @@ Disajikan lewat GitHub Pages: https://riacaya.github.io/Cek-NIK/
 | `.github/workflows/pages.yml` | Deploy otomatis ke GitHub Pages setiap push ke `main` |
 | `android-app/` | APK Android (lokal saja, tidak ikut repo) |
 | `modal/` | Arsip file lama (lokal saja, tidak ikut repo) |
+| `relay/` | Relai KPU/Kemensos untuk SIPOL & DTSEN (lokal saja, tidak ikut repo) |
 
 ## Isi `github/`
 
@@ -21,3 +22,11 @@ Disajikan lewat GitHub Pages: https://riacaya.github.io/Cek-NIK/
 ## Perubahan halaman
 
 Edit file di `github/`, lalu commit dan push ke `main`. Workflow `Deploy GitHub Pages` berjalan otomatis dan situs ter-update dalam ±1 menit.
+
+## Relai SIPOL & DTSEN
+
+GitHub Pages dan worker Cloudflare tidak bisa menjangkau `infopemilu.kpu.go.id` / `cekbansos.kemensos.go.id` (firewall mereka menolak IP cloud), jadi dua fitur itu lewat relai di PC ini:
+
+- Jalankan `relay\jalankan_relay.bat` (jendela terminal harus tetap terbuka). Script menyalakan `server.js` (port 8788) + tunnel `https://ceknik-relay-3311.loca.lt`, dan menghidupkan ulang otomatis bila mati.
+- Selama relai mati, halaman tetap jalan tetapi SIPOL & DTSEN menampilkan galat.
+- Berkas relai sengaja tidak ikut repo (`relay/` di `.gitignore`); sumber lamanya ada di riwayat git.
