@@ -1,25 +1,11 @@
-# artefak build Android
-android-app/.gradle/
-android-app/.kotlin/
-android-app/build/
-android-app/app/build/
-android-app/local.properties
-*.apk
-*.aab
+# folder lokal (bukan bagian situs GitHub)
+android-app/
+modal/
 
 # cache & state lokal
 .wrangler/
 .freebuff/
 node_modules/
-tunnel.log
-
-# bukan bagian dari penggunaan Cek-NIK — hanya di lokal
-android-app/
-endpointnik.md
-tes-*.html
-buat-tiruan.js
-worker-lokal.js
-single/id.txt
 
 # editor / OS
 Thumbs.db
