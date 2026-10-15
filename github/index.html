@@ -15,11 +15,14 @@
 :root{--blue:#2563eb;--ink:#172033;--muted:#64748b;--bg:#f1f5f9}
 #cn-page,#cn-page *{box-sizing:border-box}
 #cn-page{font:14px Arial,sans-serif;color:var(--ink)}
-html.cn-full body{margin:0;background:var(--bg);font:14px Arial,sans-serif;color:var(--ink)}
-html:not(.cn-full) #cn-page{max-width:720px;margin:12px auto;padding:10px;border-radius:12px;background:#f1f5f9}
-#cn-page header{background:linear-gradient(120deg,#1d4ed8,#0f766e);color:#fff;padding:13px 16px;border-radius:10px 10px 0 0}
-html.cn-full #cn-page header{border-radius:0}
+html.cn-full body{margin:0;background:var(--bg);font:14px Arial,sans-serif;color:var(--ink);min-height:100vh}
+html.cn-full #cn-page{min-height:100vh;display:flex;flex-direction:column}
+/* widget blog: tanpa bingkai, tanpa jarak atas header / bawah footer — rata tepi */
+html:not(.cn-full) #cn-page{max-width:720px;margin:0 auto;padding:0;border-radius:0;background:transparent}
+#cn-page header{background:linear-gradient(120deg,#1d4ed8,#0f766e);color:#fff;padding:13px 16px}
 #cn-page header>div,#cn-page main{max-width:980px;margin:auto}
+/* mode halaman penuh: konten mengisi tinggi, footer menempel di dasar layar (tanpa spasi di bawah) */
+html.cn-full #cn-page main{width:100%;margin:0 auto;flex:1 0 auto}
 #cn-page header>div{display:flex;align-items:center;gap:11px}
 #cn-page header h1{margin:0 0 2px;font-size:22px}
 #cn-page header p{margin:0;opacity:.9;font-size:12px}
@@ -57,7 +60,7 @@ html.cn-full #cn-page header{border-radius:0}
 #cn-page .head-tools{margin-left:auto}
 #cn-page .icon-btn{width:38px;height:38px;padding:0;font-size:20px;background:transparent;border:0;color:#fff}
 #cn-page .cap-icon{width:42px;height:42px;padding:0;font-size:20px}
-#cn-page .settings{position:fixed;inset:0 0 0 auto;width:min(330px,88vw);background:var(--panel,#fff);color:var(--ink);z-index:10;box-shadow:-5px 0 20px #0003;transform:translateX(105%);transition:.2s;padding:18px}
+#cn-page .settings{position:fixed;inset:0 0 0 auto;width:min(330px,88vw);background:var(--panel,#fff);color:var(--ink);z-index:10;box-shadow:-5px 0 20px #0003;transform:translateX(105%);transition:.2s;padding:18px;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto}
 #cn-page .settings.open{transform:translateX(0)}
 #cn-page .settings-head{display:flex;align-items:center;gap:8px;background:var(--blue);color:#fff;margin:-18px -18px 0;padding:12px 18px}
 #cn-page .settings-head .title-icon{font-size:20px}
@@ -76,8 +79,7 @@ html.cn-full #cn-page header{border-radius:0}
 #cn-page .theme-night input{background:#33445f;color:#fff}
 #cn-page .theme-elegan{--bg:#f7f3ea;--ink:#292524;--panel:#fffdf8;--muted:#78716c;--blue:#7c3f20;--foot:#e7d7c5;--result:#795548}
 #cn-page .theme-elegan header{background:linear-gradient(120deg,#3f2d24,#a16207)}
-#cn-page footer{text-align:center;color:var(--ink);background:var(--foot,#dbeafe);font-size:12px;padding:18px 10px 28px;border-radius:0 0 10px 10px}
-html.cn-full #cn-page footer{border-radius:0}
+#cn-page footer{text-align:center;color:var(--ink);background:var(--foot,#dbeafe);font-size:12px;padding:18px 10px 28px}
 #cn-page footer .install-app{display:block;margin:0 0 8px;font-size:13px;font-weight:700;color:var(--blue);text-decoration:none}
 #cn-page footer .install-app:active{opacity:.7}
 #cn-page .setting-row a{flex:1;color:var(--ink);text-decoration:none}
