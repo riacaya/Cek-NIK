@@ -149,10 +149,13 @@ async function kpuViaRelay(nik) {
   const t0 = Date.now();
   let r = null;
   let err = null;
-  // Maksimal 4 percobaan: kegagalan CEPAT (<7 dtk — flap sesaat edge localtunnel:
-  // 400/502/503 sering muncul ~1 menit pertama setelah tunnel bangun) diulang;
-  // kegagalan LAMBAT berarti tunnel/PC relay benar-benar mati — buang waktu kalau diulang.
-  for (let percobaan = 0; percobaan < 4; percobaan++) {
+  // Maksimal 7 percobaan dengan jeda makin lebar (0.6 dtk → 2.4 dtk, total ~10 dtk).
+  // Edge localtunnel (loca.lt) GRATIS itu suka berdebar-debar: 502/503 datang bertumpuk
+  // beberapa detik lalu pulih — jeda yang menyebar membantu menyeberangi burst itu.
+  // Kegagalan LAMBAT (satu percobaan >9 dtk) berarti tunnel/PC relay benar-benar mati,
+  // buang waktu kalau diulang → langsung lempar ke jalur langsung.
+  const MAX_TRY = 7;
+  for (let percobaan = 0; percobaan < MAX_TRY; percobaan++) {
     const tA = Date.now();
     try {
       r = await call(KPU_RELAY, {
@@ -177,8 +180,8 @@ async function kpuViaRelay(nik) {
       r = null;
       err = e;
     }
-    if (Date.now() - tA >= 7000) break;
-    if (percobaan < 3) await new Promise((res) => setTimeout(res, 600));
+    if (Date.now() - tA >= 9000) break;   // gagal lambat = relay benar-benar mati
+    if (percobaan < MAX_TRY - 1) await new Promise((res) => setTimeout(res, 600 + percobaan * 300));
   }
   if (!r) throw err || new Error('relai gagal');
   let j = null;
