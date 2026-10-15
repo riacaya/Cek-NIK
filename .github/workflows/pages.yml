@@ -1,5 +1,5 @@
-# Terbitkan folder github/ ke GitHub Pages
-name: Deploy GitHub Pages
+# Sinkronkan folder github/ ke branch gh-pages (sumber GitHub Pages)
+name: Deploy ke GitHub Pages
 
 on:
   push:
@@ -7,9 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
@@ -18,14 +16,18 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+
+      - name: Siapkan isi situs
+        run: |
+          rm -rf site
+          cp -r github site
+          touch site/.nojekyll
+
+      - name: Push ke branch gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: github
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          publish_dir: ./site
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force_orphan: true
