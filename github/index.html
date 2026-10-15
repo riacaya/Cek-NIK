@@ -3,13 +3,87 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cek KTP</title>
-<style>
-:root{--blue:#2563eb;--ink:#172033;--muted:#64748b;--bg:#f1f5f9}*{box-sizing:border-box}body{margin:0;background:var(--bg);font:14px Arial,sans-serif;color:var(--ink)}header{background:linear-gradient(120deg,#1d4ed8,#0f766e);color:#fff;padding:13px 16px}header>div,main{max-width:980px;margin:auto}header>div{display:flex;align-items:center;gap:11px}header h1{margin:0 0 2px;font-size:22px}header p{margin:0;opacity:.9;font-size:12px}.logo{width:42px;height:42px;flex:none}main{padding:10px 12px}.card{background:#fff;border-radius:10px;padding:13px;margin-bottom:10px;box-shadow:0 3px 12px #0f172a12}h2{font-size:17px;margin:0 0 4px}label{display:block;font-weight:700;margin-bottom:5px}input{width:100%;padding:9px 10px;border:1px solid #cbd5e1;border-radius:7px;font:inherit}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}button{border:0;border-radius:7px;padding:9px 13px;background:var(--blue);color:#fff;font-weight:700;cursor:pointer}button.secondary{background:#64748b}button:disabled{opacity:.6;cursor:not-allowed}.muted{color:var(--muted);font-size:12px;margin:0 0 9px}.info{font-size:11px;color:#1e40af;background:#dbeafe;padding:8px;border-radius:7px;margin-top:9px}.info code{font-size:10px}.results{display:none;margin-top:12px}.results.show{display:block}.results .result{display:block;margin-bottom:8px;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}.results .result:last-of-type{margin-bottom:0}.sumline{display:none;font-size:12px;color:#14532d;background:#dcfce7;padding:7px 9px;border-radius:7px;font-weight:700;margin-top:8px}.result .rhead{padding:9px 11px;font-weight:700;color:#fff;background:var(--result,#64748b)}.result .rhead.ok{background:#15803d}.result .rhead.err{background:#b91c1c}.result dl{display:grid;grid-template-columns:150px 1fr;margin:0;padding:10px 11px;gap:6px 10px;font-size:13px}.result dt{color:var(--muted)}.result dd{margin:0;font-weight:700;word-break:break-word}form label:not(:first-child){margin-top:9px}.caprow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}img.cap{height:46px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;flex:none}img.cap.empty{background:#e2e8f0;width:160px}.caprow input{flex:1 0 100%;margin-top:8px}
-@media(max-width:650px){main{padding:8px}.card{padding:11px}.result dl{grid-template-columns:110px 1fr}}
-.result .rhead.ok{background:var(--result,#15803d)}header>div{max-width:956px}
-.head-tools{margin-left:auto}.icon-btn{width:38px;height:38px;padding:0;font-size:20px;background:transparent;border:0;color:#fff}.cap-icon{width:42px;height:42px;padding:0;font-size:20px}.settings{position:fixed;inset:0 0 0 auto;width:min(330px,88vw);background:var(--panel,#fff);color:var(--ink);z-index:10;box-shadow:-5px 0 20px #0003;transform:translateX(105%);transition:.2s;padding:18px}.settings.open{transform:translateX(0)}.settings-head{display:flex;align-items:center;gap:8px;background:var(--blue);color:#fff;margin:-18px -18px 0;padding:12px 18px}.settings-head .title-icon{font-size:20px}.settings-head h2{margin:0}.settings-head .close-settings{margin-left:auto}.settings-head .icon-btn{border-radius:50%;background:#ffffff33;color:#fff}.setting-section{font-weight:700;font-size:13px;padding:16px 0 8px;color:var(--ink);border-bottom:1px solid #cbd5e1}.setting-row{display:flex;align-items:center;background:transparent;gap:10px;padding:13px 0;border-bottom:0}.setting-row button{flex:1;text-align:left;background:transparent;color:var(--ink);padding-left:0}.setting-row button.active::after{content:"✓";float:right;font-weight:700;color:var(--blue)}.theme-senja{--bg:#fff4e6;--ink:#422006;--panel:#fffaf3;--blue:#c2410c;--foot:#fed7aa;--result:#b45309}.theme-senja header{background:linear-gradient(120deg,#9a3412,#f59e0b)}.theme-night{--bg:#0b1220;--ink:#e5edf8;--panel:#24324a;--muted:#aebdd1;--blue:#60a5fa;--foot:#334155;--result:#26915f}.theme-night header{background:linear-gradient(120deg,#020617,#172554)}.theme-night .card{background:#24324a}.theme-night input{background:#33445f;color:#fff}.theme-elegan{--bg:#f7f3ea;--ink:#292524;--panel:#fffdf8;--muted:#78716c;--blue:#7c3f20;--foot:#e7d7c5;--result:#795548}.theme-elegan header{background:linear-gradient(120deg,#3f2d24,#a16207)}footer{text-align:center;color:var(--ink);background:var(--foot,#dbeafe);font-size:12px;padding:18px 10px 28px}footer .install-app{display:block;margin:0 0 8px;font-size:13px;font-weight:700;color:var(--blue);text-decoration:none}footer .install-app:active{opacity:.7}.setting-row a{flex:1;color:var(--ink);text-decoration:none}.setting-row a:active{opacity:.7}</style>
 </head>
 <body>
+<!-- Halaman ini mode ganda:
+     1) GitHub Pages  -> dibuka sebagai halaman penuh (cn-full).
+     2) Blog/Blogger  -> tempel SELURUH isi file ini ke pos (mode HTML); deteksi otomatis
+        membuatnya jadi widget terkurung di #cn-page sehingga tema blog tidak tersentuh.
+     Uji mode widget dari komputer: tambahkan ?widget=1 pada URL. -->
+<div id="cn-page">
+<style>
+:root{--blue:#2563eb;--ink:#172033;--muted:#64748b;--bg:#f1f5f9}
+#cn-page,#cn-page *{box-sizing:border-box}
+#cn-page{font:14px Arial,sans-serif;color:var(--ink)}
+html.cn-full body{margin:0;background:var(--bg);font:14px Arial,sans-serif;color:var(--ink)}
+html:not(.cn-full) #cn-page{max-width:720px;margin:12px auto;padding:10px;border-radius:12px;background:#f1f5f9}
+#cn-page header{background:linear-gradient(120deg,#1d4ed8,#0f766e);color:#fff;padding:13px 16px;border-radius:10px 10px 0 0}
+html.cn-full #cn-page header{border-radius:0}
+#cn-page header>div,#cn-page main{max-width:980px;margin:auto}
+#cn-page header>div{display:flex;align-items:center;gap:11px}
+#cn-page header h1{margin:0 0 2px;font-size:22px}
+#cn-page header p{margin:0;opacity:.9;font-size:12px}
+#cn-page .logo{width:42px;height:42px;flex:none}
+#cn-page main{padding:10px 12px}
+#cn-page .card{background:#fff;border-radius:10px;padding:13px;margin-bottom:10px;box-shadow:0 3px 12px #0f172a12}
+#cn-page h2{font-size:17px;margin:0 0 4px}
+#cn-page label{display:block;font-weight:700;margin-bottom:5px}
+#cn-page input{width:100%;padding:9px 10px;border:1px solid #cbd5e1;border-radius:7px;font:inherit;background:#fff;color:var(--ink)}
+#cn-page .actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+#cn-page button{border:0;border-radius:7px;padding:9px 13px;background:var(--blue);color:#fff;font-weight:700;cursor:pointer;font:inherit}
+#cn-page button.secondary{background:#64748b}
+#cn-page button:disabled{opacity:.6;cursor:not-allowed}
+#cn-page .muted{color:var(--muted);font-size:12px;margin:0 0 9px}
+#cn-page .info{font-size:11px;color:#1e40af;background:#dbeafe;padding:8px;border-radius:7px;margin-top:9px}
+#cn-page .info code{font-size:10px}
+#cn-page .results{display:none;margin-top:12px}
+#cn-page .results.show{display:block}
+#cn-page .results .result{display:block;margin-bottom:8px;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;background:#fff}
+#cn-page .results .result:last-of-type{margin-bottom:0}
+#cn-page .sumline{display:none;font-size:12px;color:#14532d;background:#dcfce7;padding:7px 9px;border-radius:7px;font-weight:700;margin-top:8px}
+#cn-page .result .rhead{padding:9px 11px;font-weight:700;color:#fff;background:var(--result,#64748b)}
+#cn-page .result .rhead.ok{background:#15803d}
+#cn-page .result .rhead.err{background:#b91c1c}
+#cn-page .result dl{display:grid;grid-template-columns:150px 1fr;margin:0;padding:10px 11px;gap:6px 10px;font-size:13px}
+#cn-page .result dt{color:var(--muted)}
+#cn-page .result dd{margin:0;font-weight:700;word-break:break-word}
+#cn-page form label:not(:first-child){margin-top:9px}
+#cn-page .caprow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#cn-page img.cap{height:46px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;flex:none}
+#cn-page img.cap.empty{background:#e2e8f0;width:160px}
+#cn-page .caprow input{flex:1 0 100%;margin-top:8px}
+#cn-page .result .rhead.ok{background:var(--result,#15803d)}
+#cn-page header>div{max-width:956px}
+#cn-page .head-tools{margin-left:auto}
+#cn-page .icon-btn{width:38px;height:38px;padding:0;font-size:20px;background:transparent;border:0;color:#fff}
+#cn-page .cap-icon{width:42px;height:42px;padding:0;font-size:20px}
+#cn-page .settings{position:fixed;inset:0 0 0 auto;width:min(330px,88vw);background:var(--panel,#fff);color:var(--ink);z-index:10;box-shadow:-5px 0 20px #0003;transform:translateX(105%);transition:.2s;padding:18px}
+#cn-page .settings.open{transform:translateX(0)}
+#cn-page .settings-head{display:flex;align-items:center;gap:8px;background:var(--blue);color:#fff;margin:-18px -18px 0;padding:12px 18px}
+#cn-page .settings-head .title-icon{font-size:20px}
+#cn-page .settings-head h2{margin:0}
+#cn-page .settings-head .close-settings{margin-left:auto}
+#cn-page .settings-head .icon-btn{border-radius:50%;background:#ffffff33;color:#fff}
+#cn-page .setting-section{font-weight:700;font-size:13px;padding:16px 0 8px;color:var(--ink);border-bottom:1px solid #cbd5e1}
+#cn-page .setting-row{display:flex;align-items:center;background:transparent;gap:10px;padding:13px 0;border-bottom:0}
+#cn-page .setting-row button{flex:1;text-align:left;background:transparent;color:var(--ink);padding-left:0}
+#cn-page .setting-row button.active::after{content:"\2713";float:right;font-weight:700;color:var(--blue)}
+#cn-page .theme-senja{--bg:#fff4e6;--ink:#422006;--panel:#fffaf3;--blue:#c2410c;--foot:#fed7aa;--result:#b45309}
+#cn-page .theme-senja header{background:linear-gradient(120deg,#9a3412,#f59e0b)}
+#cn-page .theme-night{--bg:#0b1220;--ink:#e5edf8;--panel:#24324a;--muted:#aebdd1;--blue:#60a5fa;--foot:#334155;--result:#26915f}
+#cn-page .theme-night header{background:linear-gradient(120deg,#020617,#172554)}
+#cn-page .theme-night .card{background:#24324a}
+#cn-page .theme-night input{background:#33445f;color:#fff}
+#cn-page .theme-elegan{--bg:#f7f3ea;--ink:#292524;--panel:#fffdf8;--muted:#78716c;--blue:#7c3f20;--foot:#e7d7c5;--result:#795548}
+#cn-page .theme-elegan header{background:linear-gradient(120deg,#3f2d24,#a16207)}
+#cn-page footer{text-align:center;color:var(--ink);background:var(--foot,#dbeafe);font-size:12px;padding:18px 10px 28px;border-radius:0 0 10px 10px}
+html.cn-full #cn-page footer{border-radius:0}
+#cn-page footer .install-app{display:block;margin:0 0 8px;font-size:13px;font-weight:700;color:var(--blue);text-decoration:none}
+#cn-page footer .install-app:active{opacity:.7}
+#cn-page .setting-row a{flex:1;color:var(--ink);text-decoration:none}
+#cn-page .setting-row a:active{opacity:.7}
+@media(max-width:650px){#cn-page main{padding:8px}#cn-page .card{padding:11px}#cn-page .result dl{grid-template-columns:110px 1fr}}
+</style>
 <header><div><img class="logo" src="assets/logo.png" alt="Logo kartu identitas"><div><h1>Cek KTP</h1><p>Cek NIK - SIPOL KPU - DTSEN Kemensos</p></div><div class="head-tools"><button class="icon-btn" id="settingsBtn" type="button">☰</button></div></div><aside class="settings" id="settingsPanel"><div class="settings-head"><span class="title-icon" aria-hidden="true">⚙</span><h2>Pengaturan</h2><button class="icon-btn close-settings" id="closeSettings" type="button" aria-label="Tutup pengaturan">×</button></div><div class="setting-section">Theme</div><div class="setting-row"><span>🌇</span><button type="button" id="senjaBtn">Senja</button></div><div class="setting-row"><span>🌙</span><button type="button" id="nightBtn">Night</button></div><div class="setting-row"><span>✨</span><button type="button" id="eleganBtn">Elegan</button></div><div class="setting-section">Tool</div><div class="setting-row"><span>📥</span><button type="button" id="exportBtn">Export hasil ke JSON</button></div><div class="setting-section">Aplikasi</div><div class="setting-row"><span>📲</span><a href="https://drive.google.com/file/d/1E3OGSDm7TsUeLAaXGkZG8YClzm0U1_t2/view?usp=sharing" target="_blank" rel="noopener">Install app</a></div></aside></header>
 <main>
 <section class="card"><p class="muted">Masukkan 16 digit NIK, isi CAPTCHA, lalu tekan tombol Cek NIK.</p>
@@ -17,19 +91,30 @@
 <div class="results" id="resultBox"><div class="result" id="box1"><div class="rhead" id="head1">Hasil</div><dl id="list1"></dl></div><div class="result" id="box2" style="display:none"><div class="rhead ok" id="head2">2. SIPOL KPU</div><dl id="list2"></dl></div><div class="result" id="box3" style="display:none"><div class="rhead ok" id="head3">3. DTSEN Kemensos</div><dl id="list3"></dl></div><div class="sumline" id="sumLine"></div></div>
 </section>
 </main><footer><a class="install-app" href="https://drive.google.com/file/d/1E3OGSDm7TsUeLAaXGkZG8YClzm0U1_t2/view?usp=sharing" target="_blank" rel="noopener">📲 Install app</a>Created By:<br>RiaCaya - Realization Dreams<br>Telp: +6282338013610 · Email: riacaya99@gmail.com</footer>
-<script>
 
+<script>
+'use strict';
+var $=function(id){return document.getElementById(id)};
+
+/* ---------- deteksi mode: halaman penuh (GitHub Pages) atau widget (blog) ---------- */
+var WIDGET=/(^|[?&])widget=1/.test(location.search)
+  ||(!/^riacaya\.github\.io$/i.test(location.hostname)
+     &&location.protocol!=='file:'
+     &&!/^localhost$|^127\.0\.0\.1$/i.test(location.hostname));
+document.documentElement.classList.toggle('cn-full',!WIDGET);
+// Aset wilayah: relatif di Pages, absolut dari blog (GitHub Pages mengirim CORS *).
+var ASSETS=(location.protocol==='file:')?'http://127.0.0.1:8788':(WIDGET?'https://riacaya.github.io/Cek-NIK':'.');
 var API_URL='https://divine-fog-0a93.riacaya99.workers.dev';
+
+/* ---------- data wilayah ---------- */
 var WIL_PRO={},WIL_KAB={},WIL_KEC={},WIL_LOADED=null;
 function peta(j,k){var a=j&&j[k],o={};if(Array.isArray(a)){a.forEach(function(x){if(x&&x.id!=null)o[String(x.id)]=x.nama||x.name||''});return o}return a||j||o}
 function muatWilayah(){
   if(WIL_LOADED)return WIL_LOADED;
-  var base=(location.protocol==='file:'?'http://127.0.0.1:8788':'.');
-  WIL_LOADED=Promise.all(['pro','kab','kec'].map(function(k){return fetch(base+'/assets/'+k+'.json').then(function(r){if(!r.ok)throw Error('Gagal memuat assets/'+k+'.json');return r.json()})})).then(function(a){WIL_PRO=peta(a[0],'pro');WIL_KAB=peta(a[1],'kab');WIL_KEC=peta(a[2],'kec')});
+  WIL_LOADED=Promise.all(['pro','kab','kec'].map(function(k){return fetch(ASSETS+'/assets/'+k+'.json',{cache:'force-cache'}).then(function(r){if(!r.ok)throw Error('Gagal memuat assets/'+k+'.json');return r.json()})})).then(function(a){WIL_PRO=peta(a[0],'pro');WIL_KAB=peta(a[1],'kab');WIL_KEC=peta(a[2],'kec')});
   return WIL_LOADED;
 }
 
-var $=function(id){return document.getElementById(id)};
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
 function pad(n){return (n<10?'0':'')+n}
 function usia(iso){var d=new Date(iso+'T00:00:00');var n=new Date();var a=n.getFullYear()-d.getFullYear();if(n<new Date(n.getFullYear(),d.getMonth(),d.getDate()))a--;return a}
@@ -86,7 +171,7 @@ function render(nik,v,sipol,dtsen){
   }else if(sipol&&sipol.serverOk&&sipol.kpu&&sipol.kpu.state==='error'){
     showBox(2,'2. SIPOL KPU','err',[['Status','SIPOL tidak terjangkau dari server API'],['Galat',(sipol.galat&&sipol.galat.length&&sipol.galat.join('; '))||'gagal menghubungi KPU'],['Catatan','Ini BUKAN berarti NIK tidak terdaftar — coba lagi nanti atau buka /api/selftest pada URL API.']]);
   }else{
-    showBox(2,'2. SIPOL KPU','ok',[['Status',(sipol&&!sipol.serverOk)?'server API tidak aktif — isi API_URL, atau jalankan node server.js (mode lokal)':'tidak ada data parpol untuk NIK ini']]);
+    showBox(2,'2. SIPOL KPU','ok',[['Status',(sipol&&!sipol.serverOk)?'server API tidak aktif — muat ulang halaman beberapa saat lagi':'tidak ada data parpol untuk NIK ini']]);
   }
   if(dtsen){
     if(dtsen.state==='found'){
@@ -119,9 +204,8 @@ var apiProbe=null;
 function apiKandidat(){
   var l=[];
   if(API_URL)l.push(String(API_URL).replace(/\/+$/,''));
-  // Halaman yang dibuka lewat http(s) dicoba same-origin dulu — halaman ini memang
-  // disajikan server lokal, jadi API-nya ada di port yang sama.
-  if(location.protocol==='http:'||location.protocol==='https:')l.push('');
+  // Halaman penuh di Ports lokal memakai API yang sama (server.js) — coba same-origin dulu.
+  if(!WIDGET&&(location.protocol==='http:'||location.protocol==='https:'))l.push('');
   if(location.protocol==='file:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'){l.push('http://127.0.0.1:8788');l.push('http://127.0.0.1:8787');}
   return l;
 }
@@ -162,8 +246,9 @@ $('capBtn').onclick=loadCaptcha;
 $('checkForm').onsubmit=async function(e){
   e.preventDefault();
   if(busy)return;
-  var nik=$('checkNik').value.trim();
-  if(!/^\d{16}$/.test(nik)){alert('NIK harus tepat 16 digit.');return}
+  var nik=$('checkNik').value.replace(/\D/g,'').slice(0,16);
+  $('checkNik').value=nik;
+  if(nik.length!==16){renderError('NIK harus tepat 16 digit angka.');return}
   var v=await validasiLokal(nik);
   if(!v.ok){renderError(v.alasan);return}
   var captcha=$('capInput').value.trim();
@@ -197,5 +282,21 @@ $('checkForm').onsubmit=async function(e){
 };
 $('clearBtn').onclick=function(){$('checkNik').value='';$('capInput').value='';$('resultBox').classList.remove('show');loadCaptcha()};
 loadCaptcha();
-var sp=document.getElementById('settingsPanel');document.getElementById('settingsBtn').onclick=function(){sp.classList.add('open')};document.getElementById('closeSettings').onclick=function(){sp.classList.remove('open')};function tema(t){document.body.classList.remove('theme-senja','theme-night','theme-elegan');document.body.classList.add('theme-'+t);document.querySelectorAll('.setting-row button').forEach(function(b){b.classList.remove('active')});var a=document.getElementById(t+'Btn');if(a)a.classList.add('active');localStorage.setItem('nik-theme',t)}document.getElementById('senjaBtn').onclick=function(){tema('senja')};document.getElementById('nightBtn').onclick=function(){tema('night')};document.getElementById('eleganBtn').onclick=function(){tema('elegan')};document.getElementById('exportBtn').onclick=function(){var n=document.getElementById('checkNik').value,d={nik:n,waktu:new Date().toISOString(),hasil:document.getElementById('resultBox').innerText},b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='hasil-cek-nik-'+(n||'data')+'.json';a.click();setTimeout(function(){URL.revokeObjectURL(u)},500);sp.classList.remove('open')};(function(){var t=localStorage.getItem('nik-theme')||'senja';tema(t)})();</script>
+
+/* ---------- panel pengaturan & tema ---------- */
+var sp=$('settingsPanel');$('settingsBtn').onclick=function(){sp.classList.add('open')};$('closeSettings').onclick=function(){sp.classList.remove('open')};
+function hostTema(){return WIDGET?[$('cn-page')]:[document.documentElement,$('cn-page')]}
+function tema(t){
+  var classes=['theme-senja','theme-night','theme-elegan'];
+  hostTema().forEach(function(el){classes.forEach(function(c){el.classList.remove(c)});el.classList.add('theme-'+t)});
+  document.querySelectorAll('#cn-page .setting-row button').forEach(function(b){b.classList.remove('active')});
+  var a=$(t+'Btn');if(a)a.classList.add('active');localStorage.setItem('nik-theme',t);
+}
+$('senjaBtn').onclick=function(){tema('senja')};$('nightBtn').onclick=function(){tema('night')};$('eleganBtn').onclick=function(){tema('elegan')};
+$('exportBtn').onclick=function(){
+  var n=$('checkNik').value,d={nik:n,waktu:new Date().toISOString(),hasil:$('resultBox').innerText},b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='hasil-cek-nik-'+(n||'data')+'.json';a.click();setTimeout(function(){URL.revokeObjectURL(u)},500);sp.classList.remove('open');
+};
+tema(localStorage.getItem('nik-theme')||'senja');
+</script>
+</div>
 </body></html>
